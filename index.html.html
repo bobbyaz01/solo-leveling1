@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLO LEVELING — ระบบพัฒนาตัวเอง</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Noto+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #050810;
+  --bg2:       #080d1a;
+  --panel:     #0c1428;
+  --card:      #0f1d35;
+  --border:    #1a3a6a;
+  --border2:   #0f2a50;
+  --gold:      #c8a843;
+  --gold2:     #f0d060;
+  --gold-glow: rgba(200,168,67,0.35);
+  --blue:      #2a6fdb;
+  --lblue:     #5ba3ff;
+  --teal:      #00c9a7;
+  --lteal:     #7fffec;
+  --red:       #e03050;
+  --orange:    #e07820;
+  --purple:    #9040e0;
+  --green:     #20c050;
+  --lgreen:    #70ff90;
+  --white:     #e8eeff;
+  --gray:      #506080;
+  --lgray:     #8090b0;
+  --rank-e:    #607090;
+  --rank-d:    #30a060;
+  --rank-c:    #2a6fdb;
+  --rank-b:    #9040e0;
+  --rank-a:    #e07820;
+  --rank-s:    #c8a843;
+  --rank-ss:   #e03050;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans Thai', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Particle BG ─────────────────────────────────────────────── */
+#particles {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: float linear infinite;
+  opacity: 0;
+}
+@keyframes float {
+  0%   { transform: translateY(100vh) translateX(0); opacity:0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-10vh) translateX(40px); opacity:0; }
+}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+#app {
+  position: relative; z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px 80px;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 36px 0 20px;
+  position: relative;
+}
+.header-glow {
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 200px;
+  background: radial-gradient(ellipse, rgba(200,168,67,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--gold2);
+  text-shadow: 0 0 30px var(--gold-glow), 0 0 60px rgba(200,168,67,0.15);
+  line-height: 1;
+}
+.logo span { color: var(--white); opacity: 0.6; }
+.tagline {
+  font-size: 0.8rem;
+  color: var(--lgray);
+  letter-spacing: 0.3em;
+  margin-top: 6px;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* ── Nav tabs ────────────────────────────────────────────────── */
+nav {
+  display: flex;
+  gap: 4px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 4px;
+  margin: 20px 0 24px;
+}
+.tab {
+  flex: 1; padding: 10px 4px;
+  background: transparent;
+  border: none; border-radius: 7px;
+  color: var(--lgray);
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--white); background: var(--card); }
+.tab.active {
+  background: linear-gradient(135deg, var(--blue), #1a4fa0);
+  color: var(--white);
+  box-shadow: 0 0 16px rgba(42,111,219,0.4);
+}
+
+/* ── Section ─────────────────────────────────────────────────── */
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+.card-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--lgray);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+
+/* ── Rank Badge ──────────────────────────────────────────────── */
+.rank-badge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 30px var(--gold-glow), inset 0 0 20px rgba(200,168,67,0.05);
+  font-family: 'Orbitron', monospace;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--gold2);
+  text-shadow: 0 0 20px var(--gold-glow);
+  flex-shrink: 0;
+  position: relative;
+}
+.rank-badge::after {
+  content: 'CLASS';
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--lgray);
+  position: absolute;
+  bottom: 18px;
+}
+
+/* ── EXP Bar ─────────────────────────────────────────────────── */
+.exp-bar-wrap {
+  background: var(--bg2);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.exp-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  box-shadow: 0 0 10px rgba(0,201,167,0.5);
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Stat cards ──────────────────────────────────────────────── */
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-icon { font-size: 1.5rem; margin-bottom: 4px; }
+.stat-label { font-size: 0.65rem; color: var(--lgray); letter-spacing: 0.15em; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
+.stat-value { font-family: 'Orbitron', monospace; font-size: 1.3rem; font-weight: 700; margin: 2px 0; }
+.stat-level { font-size: 0.7rem; color: var(--lgray); }
+
+/* ── Quote box ───────────────────────────────────────────────── */
+.quote-box {
+  background: linear-gradient(135deg, rgba(200,168,67,0.08), transparent);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  font-size: 0.9rem;
+  color: var(--lgold, #f0d060);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* ── Quest item ──────────────────────────────────────────────── */
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.quest-item:hover { border-color: var(--border); transform: translateX(2px); }
+.quest-item.done {
+  background: rgba(32,192,80,0.05);
+  border-color: rgba(32,192,80,0.3);
+}
+.quest-item.done .quest-name { text-decoration: line-through; color: var(--lgray); }
+
+.quest-check {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 0.8rem;
+}
+.quest-item.done .quest-check {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(32,192,80,0.4);
+}
+
+.quest-info { flex: 1; min-width: 0; }
+.quest-name { font-size: 0.88rem; font-weight: 500; }
+.quest-meta { font-size: 0.7rem; color: var(--lgray); margin-top: 2px; }
+
+.quest-exp {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.cat-pill {
+  font-size: 0.6rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ── Category colors ─────────────────────────────────────────── */
+.cat-str  { background: rgba(224,48,80,0.15);  color: #ff6080; border: 1px solid rgba(224,48,80,0.3); }
+.cat-int  { background: rgba(42,111,219,0.15); color: #7ab5ff; border: 1px solid rgba(42,111,219,0.3); }
+.cat-mnd  { background: rgba(144,64,224,0.15); color: #c080ff; border: 1px solid rgba(144,64,224,0.3); }
+.cat-wis  { background: rgba(224,120,32,0.15); color: #ffaa60; border: 1px solid rgba(224,120,32,0.3); }
+
+.exp-str  { background: rgba(224,48,80,0.2);  color: #ff6080; }
+.exp-int  { background: rgba(42,111,219,0.2); color: #7ab5ff; }
+.exp-mnd  { background: rgba(144,64,224,0.2); color: #c080ff; }
+.exp-wis  { background: rgba(224,120,32,0.2); color: #ffaa60; }
+
+/* ── Progress ring ───────────────────────────────────────────── */
+.ring-wrap { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-bg   { fill: none; stroke: var(--border2); stroke-width: 6; }
+.ring-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1); }
+.ring-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem; font-weight: 700;
+}
+
+/* ── History item ────────────────────────────────────────────── */
+.history-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.history-item:last-child { border-bottom: none; }
+.history-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 6px; flex-shrink: 0;
+}
+.history-date { font-size: 0.7rem; color: var(--lgray); }
+.history-name { font-size: 0.85rem; }
+.history-exp  { font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; }
+
+/* ── Reward card ─────────────────────────────────────────────── */
+.reward-card {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex; gap: 12px; align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reward-card:hover:not(.locked) { border-color: var(--gold); }
+.reward-card.locked { opacity: 0.45; cursor: not-allowed; }
+.reward-card.redeemed {
+  background: rgba(32,192,80,0.05);
+  border-color: rgba(32,192,80,0.4);
+}
+.reward-icon { font-size: 1.8rem; flex-shrink: 0; }
+.reward-name { font-size: 0.88rem; font-weight: 600; }
+.reward-desc { font-size: 0.7rem; color: var(--lgray); margin-top: 2px; }
+.reward-cost {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--gold2);
+  white-space: nowrap;
+}
+.reward-status { font-size: 0.7rem; margin-top: 2px; }
+
+/* ── Custom quest form ───────────────────────────────────────── */
+.form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.form-input, .form-select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--white);
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-input:focus, .form-select:focus { border-color: var(--blue); }
+.form-select option { background: var(--panel); }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--blue), #1a4fa0);
+  color: white;
+  box-shadow: 0 4px 15px rgba(42,111,219,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(42,111,219,0.4); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), #a07020);
+  color: #0a0800;
+  font-weight: 700;
+}
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--gold-glow); }
+.btn-danger {
+  background: rgba(224,48,80,0.15);
+  color: var(--red);
+  border: 1px solid rgba(224,48,80,0.3);
+}
+.btn-danger:hover { background: rgba(224,48,80,0.25); }
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+
+/* ── Level-up overlay ────────────────────────────────────────── */
+#lvlup-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: none;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+}
+#lvlup-overlay.show { display: flex; animation: overlayIn 0.4s ease; }
+@keyframes overlayIn { from { opacity:0; } to { opacity:1; } }
+
+.lvlup-box {
+  text-align: center;
+  animation: lvlupBounce 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes lvlupBounce {
+  from { transform: scale(0.3); opacity:0; }
+  to   { transform: scale(1);   opacity:1; }
+}
+.lvlup-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 3.5rem; font-weight: 900;
+  color: var(--gold2);
+  text-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(200,168,67,0.3);
+  letter-spacing: 0.1em;
+}
+.lvlup-sub { font-size: 1.1rem; color: var(--lgray); margin-top: 8px; }
+.lvlup-rank {
+  font-family: 'Orbitron', monospace;
+  font-size: 5rem; font-weight: 900;
+  margin: 20px 0;
+  text-shadow: 0 0 50px currentColor;
+}
+.lvlup-dismiss { margin-top: 24px; }
+
+/* sparkles */
+.sparkle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1001;
+  font-size: 1.5rem;
+  animation: sparkle-fly 1.2s ease-out forwards;
+}
+@keyframes sparkle-fly {
+  0%   { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity:0; }
+}
+
+/* ── Chart ───────────────────────────────────────────────────── */
+.chart-wrap { position: relative; height: 180px; margin-top: 10px; }
+.chart-bars {
+  display: flex; align-items: flex-end; gap: 6px;
+  height: 100%; padding-bottom: 24px;
+}
+.chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.8s cubic-bezier(0.4,0,0.2,1);
+  min-height: 3px;
+}
+.chart-label { font-size: 0.6rem; color: var(--lgray); }
+.chart-val { font-size: 0.6rem; color: var(--lgray); }
+
+/* ── Rank roadmap ────────────────────────────────────────────── */
+.rank-road { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 8px 0; }
+.rank-node {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 70px;
+}
+.rank-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 900;
+  border: 2px solid; position: relative; z-index: 1;
+}
+.rank-circle.active { box-shadow: 0 0 20px currentColor; }
+.rank-circle.locked { opacity: 0.3; }
+.rank-node-label { font-size: 0.6rem; color: var(--lgray); margin-top: 4px; white-space: nowrap; }
+.rank-line { flex: 1; height: 2px; background: var(--border2); min-width: 20px; }
+.rank-line.done { background: var(--gold); }
+
+/* ── Streak ──────────────────────────────────────────────────── */
+.streak-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 3rem; font-weight: 900;
+  color: var(--orange);
+  text-shadow: 0 0 20px rgba(224,120,32,0.5);
+  line-height: 1;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ── Section headers ─────────────────────────────────────────── */
+.section-hdr {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.section-hdr h2 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.section-hdr .line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.mb14 { margin-bottom: 14px; }
+.mb20 { margin-bottom: 20px; }
+.mt10 { margin-top: 10px; }
+.flex { display: flex; }
+.gap8 { gap: 8px; }
+.gap12 { gap: 12px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.flex1 { flex: 1; }
+.text-sm { font-size: 0.8rem; }
+.text-xs { font-size: 0.7rem; }
+.text-gold { color: var(--gold2); }
+.text-lgray { color: var(--lgray); }
+.text-green { color: var(--lgreen); }
+.text-red   { color: var(--red); }
+.font-mono { font-family: 'Orbitron', monospace; }
+.bold { font-weight: 700; }
+.mt20 { margin-top: 20px; }
+
+@media (max-width: 600px) {
+  .grid2, .grid3, .grid4 { grid-template-columns: 1fr 1fr; }
+  .logo { font-size: 1.8rem; }
+  nav { flex-wrap: wrap; }
+  .tab { flex: none; min-width: calc(50% - 4px); }
+}
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div id="particles"></div>
+
+<!-- Level-up overlay -->
+<div id="lvlup-overlay">
+  <div class="lvlup-box">
+    <div class="lvlup-title">⚔ RANK UP ⚔</div>
+    <div class="lvlup-rank" id="lvlup-rank-text">S</div>
+    <div class="lvlup-sub" id="lvlup-sub-text">คุณได้รับการยกระดับ!</div>
+    <div class="lvlup-dismiss">
+      <button class="btn btn-gold" onclick="closeLvlUp()">รับทราบ ⚡</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <!-- Header -->
+  <header>
+    <div class="header-glow"></div>
+    <div class="logo">⚔ SOLO<span> /</span> LEVELING</div>
+    <div class="tagline">SELF DEVELOPMENT SYSTEM — ระบบพัฒนาตัวเอง</div>
+  </header>
+
+  <!-- Nav -->
+  <nav>
+    <button class="tab active" onclick="showTab('status')">🏆 Status</button>
+    <button class="tab" onclick="showTab('quest')">⚔️ Quest</button>
+    <button class="tab" onclick="showTab('history')">📅 History</button>
+    <button class="tab" onclick="showTab('reward')">🎁 Reward</button>
+    <button class="tab" onclick="showTab('stats')">📊 Stats</button>
+    <button class="tab" onclick="showTab('custom')">⚙️ Custom</button>
+  </nav>
+
+  <!-- ══ TAB: STATUS ══════════════════════════════════════════════ -->
+  <div id="tab-status" class="section active">
+
+    <!-- Quote -->
+    <div class="quote-box mb20" id="daily-quote">
+      "จงลุกขึ้นและเผชิญหน้ากับความท้าทาย — นั่นคือหน้าที่ของ Hunter"
+    </div>
+
+    <!-- Hunter info + Rank -->
+    <div class="card mb14">
+      <div class="flex gap12 items-center" style="flex-wrap:wrap;">
+        <div class="rank-badge" id="rank-badge">E</div>
+        <div style="flex:1;min-width:200px;">
+          <div class="flex items-center gap8 mb14">
+            <div>
+              <div style="font-size:0.7rem;color:var(--lgray);letter-spacing:0.15em;font-family:'Rajdhani',sans-serif;">HUNTER</div>
+              <div style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;" id="hunter-name-display">Hunter</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--panel);border:1px solid var(--border);color:var(--lgray);margin-left:auto;" onclick="editName()">✏️</button>
+          </div>
+
+          <div class="flex justify-between text-xs text-lgray mb14" style="margin-bottom:4px;">
+            <span>EXP สะสม</span>
+            <span><span class="font-mono text-gold" id="total-exp-display">0</span> XP</span>
+          </div>
+          <div class="exp-bar-wrap">
+            <div class="exp-bar-fill" id="main-exp-bar" style="width:0%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-lgray mt10" style="margin-top:4px;">
+            <span id="rank-min-label">E Class (0 XP)</span>
+            <span id="rank-next-label">D Class (100 XP)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats 4 cards -->
+    <div class="grid4 mb14">
+      <div class="stat-card">
+        <div class="stat-icon">💪</div>
+        <div class="stat-label">STR</div>
+        <div class="stat-value" style="color:#ff6080;" id="str-exp">0</div>
+        <div class="stat-level" id="str-lv">Lv.0</div>
+        <div class="exp-bar-wrap mt10" style="margin-top:6px;">
+          <div class="exp-bar-fill" style="background:linear-gradient(90deg,var(--red),#ff8080);" id="str-bar"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🧠</div>
+        <div class="stat-label">INT</div>
+        <div class="stat-value" style="color:#7ab5ff;" id="int-exp">0</div>
+        <div class="stat-level" id="int-lv">Lv.0</div>
+        <div class="exp-bar-wrap mt10" style="margin-top:6px;">
+          <div class="exp-bar-fill" style="background:linear-gradient(90deg,var(--blue),#7ab5ff);" id="int-bar"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🧘</div>
+        <div class="stat-label">MND</div>
+        <div class="stat-value" style="color:#c080ff;" id="mnd-exp">0</div>
+        <div class="stat-level" id="mnd-lv">Lv.0</div>
+        <div class="exp-bar-wrap mt10" style="margin-top:6px;">
+          <div class="exp-bar-fill" style="background:linear-gradient(90deg,var(--purple),#c080ff);" id="mnd-bar"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">WIS</div>
+        <div class="stat-value" style="color:#ffaa60;" id="wis-exp">0</div>
+        <div class="stat-level" id="wis-lv">Lv.0</div>
+        <div class="exp-bar-wrap mt10" style="margin-top:6px;">
+          <div class="exp-bar-fill" style="background:linear-gradient(90deg,var(--orange),#ffaa60);" id="wis-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak + Today progress -->
+    <div class="grid2 mb14">
+      <div class="card">
+        <div class="card-title">🔥 Streak</div>
+        <div class="flex items-center gap12">
+          <div class="streak-num" id="streak-display">0</div>
+          <div>
+            <div class="text-sm bold" id="streak-label">วันติดต่อกัน</div>
+            <div class="text-xs text-lgray mt10" id="streak-best">Best: 0 วัน</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 วันนี้</div>
+        <div class="flex items-center gap12">
+          <div class="ring-wrap">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle class="ring-bg" cx="40" cy="40" r="32"/>
+              <circle class="ring-fill" id="today-ring" cx="40" cy="40" r="32"
+                stroke="var(--teal)"
+                stroke-dasharray="201"
+                stroke-dashoffset="201"/>
+            </svg>
+            <div class="ring-text text-teal font-mono" id="today-pct" style="color:var(--teal);font-size:0.9rem;">0%</div>
+          </div>
+          <div>
+            <div class="font-mono bold" style="font-size:1.4rem;" id="today-exp">+0 XP</div>
+            <div class="text-xs text-lgray">วันนี้ได้รับ</div>
+            <div class="text-xs text-lgray mt10" id="today-quests">0 quest สำเร็จ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rank Roadmap -->
+    <div class="card">
+      <div class="card-title">🗺 RANK ROADMAP</div>
+      <div class="rank-road" id="rank-road"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: QUEST ══════════════════════════════════════════════ -->
+  <div id="tab-quest" class="section">
+    <div class="flex justify-between items-center mb14">
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--gold2);" id="quest-date-label">Quest ประจำวัน</div>
+        <div class="text-xs text-lgray" id="quest-reset-label">รีเซตอัตโนมัติทุกวัน</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="resetTodayQuests()">🔄 Reset วันนี้</button>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="flex gap8 mb14" style="flex-wrap:wrap;">
+      <button class="btn btn-sm active-filter" onclick="filterQuests('all')" id="filter-all"
+        style="background:var(--blue);color:white;border:none;">ทั้งหมด</button>
+      <button class="btn btn-sm" onclick="filterQuests('str')" id="filter-str"
+        style="background:rgba(224,48,80,0.15);color:#ff6080;border:1px solid rgba(224,48,80,0.3);">💪 ร่างกาย</button>
+      <button class="btn btn-sm" onclick="filterQuests('int')" id="filter-int"
+        style="background:rgba(42,111,219,0.15);color:#7ab5ff;border:1px solid rgba(42,111,219,0.3);">🧠 ความรู้</button>
+      <button class="btn btn-sm" onclick="filterQuests('mnd')" id="filter-mnd"
+        style="background:rgba(144,64,224,0.15);color:#c080ff;border:1px solid rgba(144,64,224,0.3);">🧘 จิตใจ</button>
+      <button class="btn btn-sm" onclick="filterQuests('wis')" id="filter-wis"
+        style="background:rgba(224,120,32,0.15);color:#ffaa60;border:1px solid rgba(224,120,32,0.3);">💰 การเงิน</button>
+    </div>
+
+    <div id="quest-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
+  <!-- ══ TAB: HISTORY ════════════════════════════════════════════ -->
+  <div id="tab-history" class="section">
+    <div class="section-hdr">
+      <h2>📅 Quest History</h2>
+      <div class="line"></div>
+      <span class="text-xs text-lgray" id="history-count">0 รายการ</span>
+    </div>
+
+    <!-- Summary row -->
+    <div class="grid3 mb14">
+      <div class="card" style="text-align:center;">
+        <div class="text-xs text-lgray mb14">Quest สำเร็จรวม</div>
+        <div class="font-mono bold" style="font-size:1.6rem;color:var(--teal);" id="hist-total-quests">0</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="text-xs text-lgray mb14">EXP รวมทั้งหมด</div>
+        <div class="font-mono bold" style="font-size:1.6rem;color:var(--gold2);" id="hist-total-exp">0</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="text-xs text-lgray mb14">วันที่ active</div>
+        <div class="font-mono bold" style="font-size:1.6rem;color:var(--purple);" id="hist-active-days">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="history-list"></div>
+      <div id="history-empty" class="text-xs text-lgray" style="text-align:center;padding:30px;">
+        ยังไม่มีประวัติ — เริ่มทำ Quest เลยครับ! ⚔️
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: REWARD ═════════════════════════════════════════════ -->
+  <div id="tab-reward" class="section">
+    <div class="section-hdr">
+      <h2>🎁 Reward Shop</h2>
+      <div class="line"></div>
+      <span class="font-mono text-gold" id="reward-exp-display">0 XP</span>
+    </div>
+    <div class="text-xs text-lgray mb20">ใช้ EXP แลกรางวัลให้ตัวเอง — เป็นแรงจูงใจในการทำ Quest!</div>
+    <div id="reward-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
+  <!-- ══ TAB: STATS ══════════════════════════════════════════════ -->
+  <div id="tab-stats" class="section">
+    <div class="section-hdr"><h2>📊 EXP Progress Chart</h2><div class="line"></div></div>
+
+    <div class="card mb14">
+      <div class="card-title">EXP ที่ได้รับรายวัน (14 วันล่าสุด)</div>
+      <div class="chart-wrap">
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+    </div>
+
+    <div class="grid2 mb14">
+      <div class="card">
+        <div class="card-title">🏆 สถิติรวม</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="flex justify-between text-sm">
+            <span class="text-lgray">วันที่เล่น</span>
+            <span class="font-mono" id="stat-days">0 วัน</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-lgray">Quest สำเร็จ</span>
+            <span class="font-mono" id="stat-quests">0 ข้อ</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-lgray">EXP รวม</span>
+            <span class="font-mono text-gold" id="stat-exp">0 XP</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-lgray">Streak ดีที่สุด</span>
+            <span class="font-mono" style="color:var(--orange);" id="stat-streak">0 วัน</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 EXP แยกตาม Stat</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div>
+            <div class="flex justify-between text-xs mb14" style="margin-bottom:3px;">
+              <span style="color:#ff6080;">💪 STR</span>
+              <span class="font-mono" id="chart-str">0 XP</span>
+            </div>
+            <div class="exp-bar-wrap"><div class="exp-bar-fill" style="background:var(--red);" id="chart-str-bar"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb14" style="margin-bottom:3px;">
+              <span style="color:#7ab5ff;">🧠 INT</span>
+              <span class="font-mono" id="chart-int">0 XP</span>
+            </div>
+            <div class="exp-bar-wrap"><div class="exp-bar-fill" style="background:var(--blue);" id="chart-int-bar"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb14" style="margin-bottom:3px;">
+              <span style="color:#c080ff;">🧘 MND</span>
+              <span class="font-mono" id="chart-mnd">0 XP</span>
+            </div>
+            <div class="exp-bar-wrap"><div class="exp-bar-fill" style="background:var(--purple);" id="chart-mnd-bar"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb14" style="margin-bottom:3px;">
+              <span style="color:#ffaa60;">💰 WIS</span>
+              <span class="font-mono" id="chart-wis">0 XP</span>
+            </div>
+            <div class="exp-bar-wrap"><div class="exp-bar-fill" style="background:var(--orange);" id="chart-wis-bar"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex justify-between items-center mb14">
+        <div class="card-title" style="margin-bottom:0;">⚠️ Danger Zone</div>
+      </div>
+      <div class="text-xs text-lgray mb14">รีเซตข้อมูลทั้งหมด — ไม่สามารถย้อนกลับได้!</div>
+      <button class="btn btn-danger btn-sm" onclick="resetAll()">🗑 รีเซตข้อมูลทั้งหมด</button>
+    </div>
+  </div>
+
+  <!-- ══ TAB: CUSTOM ══════════════════════════════════════════════ -->
+  <div id="tab-custom" class="section">
+    <div class="section-hdr"><h2>⚙️ Custom Quest</h2><div class="line"></div></div>
+    <div class="text-xs text-lgray mb20">เพิ่ม Quest ที่ออกแบบเองได้เลย</div>
+
+    <div class="card mb14">
+      <div class="card-title">➕ สร้าง Quest ใหม่</div>
+      <div class="form-row">
+        <input class="form-input" id="cq-name" placeholder="ชื่อ Quest เช่น วิ่ง 5K">
+      </div>
+      <div class="form-row">
+        <select class="form-select" id="cq-cat">
+          <option value="str">💪 ร่างกาย (STR)</option>
+          <option value="int">🧠 ความรู้ (INT)</option>
+          <option value="mnd">🧘 จิตใจ (MND)</option>
+          <option value="wis">💰 การเงิน (WIS)</option>
+        </select>
+        <input class="form-input" id="cq-exp" type="number" placeholder="EXP (1-200)" min="1" max="200" style="max-width:140px;">
+      </div>
+      <div class="form-row">
+        <input class="form-input" id="cq-cond" placeholder="เงื่อนไข เช่น วิ่งอย่างน้อย 5 กิโลเมตร">
+      </div>
+      <button class="btn btn-primary" onclick="addCustomQuest()">➕ เพิ่ม Quest</button>
+    </div>
+
+    <div class="section-hdr mt20"><h2>📋 Custom Quests ของฉัน</h2><div class="line"></div></div>
+    <div id="custom-quest-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div id="custom-quest-empty" class="text-xs text-lgray" style="text-align:center;padding:30px;">
+      ยังไม่มี Custom Quest — สร้างเลย! 🎯
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+
+const DEFAULT_QUESTS = [
+  // STR
+  {id:'q1',  name:'วิ่งหรือเดิน 30 นาที',          cat:'str', exp:50, cond:'วิ่ง/เดิน ≥ 30 นาที'},
+  {id:'q2',  name:'ออกกำลังกาย 20 นาที',            cat:'str', exp:30, cond:'ออกกำลังกายใดก็ได้'},
+  {id:'q3',  name:'นอนหลับ 7+ ชั่วโมง',             cat:'str', exp:20, cond:'เข้านอนก่อนเที่ยงคืน'},
+  {id:'q4',  name:'ดื่มน้ำ 8 แก้ว',                 cat:'str', exp:10, cond:'จิบน้ำตลอดวัน'},
+  {id:'q5',  name:'ไม่กิน junk food ทั้งวัน',       cat:'str', exp:25, cond:'งดของขยะ 1 วันเต็ม'},
+  {id:'q6',  name:'ยืดเหยียด/โยคะ 10 นาที',         cat:'str', exp:15, cond:'ก่อนนอนหรือตื่นเช้า'},
+  // INT
+  {id:'q7',  name:'อ่านหนังสือ 30 นาที',            cat:'int', exp:40, cond:'อ่านหนังสือใดก็ได้'},
+  {id:'q8',  name:'เรียนรู้สิ่งใหม่ 1 อย่าง',      cat:'int', exp:30, cond:'บันทึกสิ่งที่เรียนรู้'},
+  {id:'q9',  name:'ฟัง Podcast/คอร์ส 20 นาที',      cat:'int', exp:25, cond:'ฟังเนื้อหาที่มีประโยชน์'},
+  {id:'q10', name:'เขียน Journal',                   cat:'int', exp:20, cond:'เขียนสิ่งที่เกิดขึ้นวันนี้'},
+  {id:'q11', name:'ฝึกทักษะ 45 นาที',               cat:'int', exp:50, cond:'ทำงานฝีมือหรือทักษะที่ฝึก'},
+  {id:'q12', name:'No Social Media 3 ชั่วโมง',       cat:'int', exp:35, cond:'ใช้เวลาอย่างมีคุณค่า'},
+  // MND
+  {id:'q13', name:'นั่งสมาธิ 10 นาที',              cat:'mnd', exp:30, cond:'ฝึกสมาธิหรือหายใจลึก'},
+  {id:'q14', name:'ขอบคุณ 3 สิ่งในวันนี้',          cat:'mnd', exp:15, cond:'เขียนหรือนึกถึง 3 สิ่ง'},
+  {id:'q15', name:'พักจากจอ 1 ชั่วโมง',             cat:'mnd', exp:20, cond:'ทำกิจกรรมออฟไลน์'},
+  {id:'q16', name:'ทำสิ่งดีให้คนอื่น 1 อย่าง',      cat:'mnd', exp:25, cond:'ช่วยเหลือหรือให้กำลังใจ'},
+  {id:'q17', name:'ไม่บ่น/โกรธทั้งวัน',             cat:'mnd', exp:40, cond:'ควบคุมอารมณ์ตลอดวัน'},
+  // WIS
+  {id:'q18', name:'บันทึกรายรับ-รายจ่าย',           cat:'wis', exp:30, cond:'จดทุกรายการวันนี้'},
+  {id:'q19', name:'ไม่ซื้อของที่ไม่จำเป็น',         cat:'wis', exp:35, cond:'งดซื้อ impulse buy'},
+  {id:'q20', name:'อ่านข่าวการเงิน/ลงทุน',          cat:'wis', exp:20, cond:'อ่านอย่างน้อย 1 บทความ'},
+  {id:'q21', name:'โอนเงินเก็บออม',                  cat:'wis', exp:50, cond:'ออมตามแผนที่ตั้งไว้'},
+];
+
+const REWARDS = [
+  {id:'r1',  name:'🍕 กินอาหารที่ชอบ',        cost:100,  desc:'กินร้านโปรดที่อยากกิน'},
+  {id:'r2',  name:'🎮 เล่นเกม 2 ชั่วโมง',     cost:150,  desc:'เล่นเกมโดยไม่รู้สึกผิด'},
+  {id:'r3',  name:'🎬 ดูหนัง/ซีรีส์',         cost:200,  desc:'ดูได้เต็มๆ 1 เรื่อง'},
+  {id:'r4',  name:'🛌 นอนดึกได้ 1 คืน',       cost:120,  desc:'พักผ่อนตามใจ'},
+  {id:'r5',  name:'🛍️ ช้อปปิ้ง (200฿)',      cost:300,  desc:'ซื้อของที่อยากได้'},
+  {id:'r6',  name:'☕ คาเฟ่ premium',          cost:180,  desc:'ไปนั่งคาเฟ่สักที่'},
+  {id:'r7',  name:'🏖️ วันหยุดพิเศษ',          cost:500,  desc:'หยุดได้ 1 วันโดยไม่ต้องรู้สึกผิด'},
+  {id:'r8',  name:'💆 นวด/Spa',               cost:400,  desc:'ผ่อนคลายร่างกาย'},
+  {id:'r9',  name:'🎵 ซื้อเพลง/subscription', cost:250,  desc:'Upgrade entertainment'},
+  {id:'r10', name:'📚 ซื้อหนังสือใหม่',        cost:350,  desc:'หนังสือที่อยากอ่าน'},
+  {id:'r11', name:'🍣 กินอาหารแพง',            cost:600,  desc:'ร้านที่อยากลองมานาน'},
+  {id:'r12', name:'✈️ ทริปสั้น',              cost:2000, desc:'S-Rank Reward สูงสุด!'},
+];
+
+const RANKS = [
+  {rank:'E', min:0,     max:100,   color:'var(--rank-e)'},
+  {rank:'D', min:100,   max:400,   color:'var(--rank-d)'},
+  {rank:'C', min:400,   max:1000,  color:'var(--rank-c)'},
+  {rank:'B', min:1000,  max:2500,  color:'var(--rank-b)'},
+  {rank:'A', min:2500,  max:5000,  color:'var(--rank-a)'},
+  {rank:'S', min:5000,  max:10000, color:'var(--rank-s)'},
+  {rank:'SS',min:10000, max:99999, color:'var(--rank-ss)'},
+];
+
+const QUOTES = [
+  '"จงลุกขึ้นและเผชิญหน้ากับความท้าทาย — นั่นคือหน้าที่ของ Hunter"',
+  '"ไม่มี Dungeon ไหนที่ยากเกินไป ถ้าคุณพร้อมเพียงพอ"',
+  '"EXP ทุก point คือหยาดเหงื่อที่กลายเป็นพลัง"',
+  '"Hunter ที่แข็งแกร่งที่สุด คือคนที่ไม่เคยหยุดฝึก"',
+  '"วันที่คุณไม่อยากทำ คือวันที่ต้องทำที่สุด"',
+  '"ความสม่ำเสมอสร้าง Legend — ไม่ใช่ความสามารถ"',
+  '"Level ที่แท้จริงวัดจากนิสัย ไม่ใช่ความสามารถ"',
+  '"ทุก Quest ที่ทำเสร็จ คือก้าวที่ใกล้ S-Rank มากขึ้น"',
+];
+
+const CAT_INFO = {
+  str: {label:'💪 ร่างกาย', cls:'cat-str', expCls:'exp-str', statKey:'str'},
+  int: {label:'🧠 ความรู้', cls:'cat-int', expCls:'exp-int', statKey:'int'},
+  mnd: {label:'🧘 จิตใจ',  cls:'cat-mnd', expCls:'exp-mnd', statKey:'mnd'},
+  wis: {label:'💰 การเงิน',cls:'cat-wis', expCls:'exp-wis', statKey:'wis'},
+};
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+function loadState() {
+  try {
+    const s = localStorage.getItem('sl_state');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return {
+    hunterName: 'Hunter',
+    totalExp: {str:0, int:0, mnd:0, wis:0},
+    todayDone: {},        // questId -> true, keyed by date
+    todayDate: '',
+    history: [],          // [{date, questId, questName, cat, exp}]
+    redeemed: {},         // rewardId -> true
+    customQuests: [],
+    streak: 0,
+    bestStreak: 0,
+    lastActiveDate: '',
+    dailyExp: {},         // date -> exp gained
+  };
+}
+function saveState() {
+  localStorage.setItem('sl_state', JSON.stringify(state));
+}
+
+let state = loadState();
+const today = new Date().toISOString().slice(0,10);
+
+// Auto-reset quest done status each new day
+if (state.todayDate !== today) {
+  // update streak
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (state.lastActiveDate === yesterday && Object.keys(state.todayDone).length > 0) {
+    state.streak = (state.streak || 0) + 1;
+  } else if (state.lastActiveDate !== today) {
+    state.streak = 0;
+  }
+  state.todayDone = {};
+  state.todayDate = today;
+  saveState();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+function getTotalExp() {
+  return (state.totalExp.str||0)+(state.totalExp.int||0)+(state.totalExp.mnd||0)+(state.totalExp.wis||0);
+}
+function getRankInfo(exp) {
+  for (let i = RANKS.length-1; i >= 0; i--) {
+    if (exp >= RANKS[i].min) return RANKS[i];
+  }
+  return RANKS[0];
+}
+function getRankColor(rank) {
+  const r = RANKS.find(x=>x.rank===rank);
+  return r ? r.color : 'var(--rank-e)';
+}
+function getAllQuests() {
+  return [...DEFAULT_QUESTS, ...(state.customQuests||[])];
+}
+function getTodayExp() {
+  const quests = getAllQuests();
+  return quests
+    .filter(q => state.todayDone[q.id])
+    .reduce((s,q) => s + q.exp, 0);
+}
+function getTodayDoneCount() {
+  return getAllQuests().filter(q => state.todayDone[q.id]).length;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARTICLES
+// ══════════════════════════════════════════════════════════════════
+(function() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left: ${Math.random()*100}%;
+      animation-duration: ${6+Math.random()*12}s;
+      animation-delay: ${Math.random()*10}s;
+      width: ${1+Math.random()*2}px;
+      height: ${1+Math.random()*2}px;
+      opacity: ${0.2+Math.random()*0.4};
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ══════════════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  if (name==='status')  renderStatus();
+  if (name==='quest')   renderQuests('all');
+  if (name==='history') renderHistory();
+  if (name==='reward')  renderRewards();
+  if (name==='stats')   renderStats();
+  if (name==='custom')  renderCustomQuests();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER STATUS
+// ══════════════════════════════════════════════════════════════════
+function renderStatus() {
+  const exp = getTotalExp();
+  const rank = getRankInfo(exp);
+  const nextRank = RANKS[RANKS.indexOf(rank)+1];
+
+  // name
+  document.getElementById('hunter-name-display').textContent = state.hunterName || 'Hunter';
+
+  // rank badge
+  const badge = document.getElementById('rank-badge');
+  badge.textContent = rank.rank;
+  badge.style.borderColor = rank.color;
+  badge.style.color = rank.color;
+  badge.style.boxShadow = `0 0 30px ${rank.color}66, inset 0 0 20px ${rank.color}11`;
+
+  // total exp
+  document.getElementById('total-exp-display').textContent = exp.toLocaleString();
+
+  // exp bar
+  let pct = 0;
+  if (nextRank) {
+    pct = ((exp - rank.min) / (nextRank.min - rank.min)) * 100;
+  } else pct = 100;
+  document.getElementById('main-exp-bar').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('rank-min-label').textContent = `${rank.rank} Class (${rank.min.toLocaleString()} XP)`;
+  document.getElementById('rank-next-label').textContent = nextRank
+    ? `${nextRank.rank} Class (${nextRank.min.toLocaleString()} XP)` : 'MAX RANK ⚡';
+
+  // stats
+  const stats = ['str','int','mnd','wis'];
+  stats.forEach(s => {
+    const v = state.totalExp[s]||0;
+    const lv = Math.floor(v/100);
+    document.getElementById(s+'-exp').textContent = v.toLocaleString();
+    document.getElementById(s+'-lv').textContent = 'Lv.' + lv;
+    const maxStat = Math.max(...stats.map(x=>state.totalExp[x]||0), 1);
+    document.getElementById(s+'-bar').style.width = (v/Math.max(maxStat,1)*100) + '%';
+  });
+
+  // quote
+  const q = QUOTES[new Date().getDate() % QUOTES.length];
+  document.getElementById('daily-quote').textContent = q;
+
+  // streak
+  document.getElementById('streak-display').textContent = state.streak||0;
+  document.getElementById('streak-best').textContent = 'Best: '+(state.bestStreak||0)+' วัน';
+
+  // today ring
+  const allQ = getAllQuests();
+  const todayPct = allQ.length > 0 ? (getTodayDoneCount()/allQ.length*100) : 0;
+  const circumference = 201;
+  const offset = circumference * (1 - todayPct/100);
+  document.getElementById('today-ring').style.strokeDashoffset = offset;
+  document.getElementById('today-pct').textContent = Math.round(todayPct)+'%';
+  document.getElementById('today-exp').textContent = '+'+getTodayExp()+' XP';
+  document.getElementById('today-quests').textContent = getTodayDoneCount()+' quest สำเร็จ';
+
+  // rank roadmap
+  const road = document.getElementById('rank-road');
+  road.innerHTML = '';
+  RANKS.forEach((r,i) => {
+    if (i>0) {
+      const line = document.createElement('div');
+      line.className = 'rank-line' + (exp >= r.min ? ' done' : '');
+      road.appendChild(line);
+    }
+    const node = document.createElement('div');
+    node.className = 'rank-node';
+    const circle = document.createElement('div');
+    circle.className = 'rank-circle' + (exp>=r.min?' active':' locked');
+    circle.style.borderColor = r.color;
+    circle.style.color = r.color;
+    circle.style.background = exp>=r.min ? r.color+'22' : 'transparent';
+    circle.textContent = r.rank;
+    const lbl = document.createElement('div');
+    lbl.className = 'rank-node-label';
+    lbl.textContent = r.min.toLocaleString()+' XP';
+    node.appendChild(circle);
+    node.appendChild(lbl);
+    road.appendChild(node);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER QUESTS
+// ══════════════════════════════════════════════════════════════════
+let currentFilter = 'all';
+function filterQuests(cat) {
+  currentFilter = cat;
+  // reset filter buttons
+  ['all','str','int','mnd','wis'].forEach(f => {
+    const btn = document.getElementById('filter-'+f);
+    if (!btn) return;
+    if (f==='all') btn.style.background = cat==='all' ? 'var(--blue)' : 'var(--panel)';
+    else {
+      const colors = {str:'rgba(224,48,80',int:'rgba(42,111,219',mnd:'rgba(144,64,224',wis:'rgba(224,120,32'};
+      btn.style.background = cat===f ? colors[f]+',0.4)' : colors[f]+',0.15)';
+    }
+  });
+  renderQuests(cat);
+}
+
+function renderQuests(filter) {
+  const list = document.getElementById('quest-list');
+  const quests = getAllQuests().filter(q => filter==='all' || q.cat===filter);
+  list.innerHTML = '';
+
+  const dateStr = new Date().toLocaleDateString('th-TH', {weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('quest-date-label').textContent = '⚔️ Quest — ' + dateStr;
+
+  quests.forEach(q => {
+    const done = !!state.todayDone[q.id];
+    const cat = CAT_INFO[q.cat];
+    const el = document.createElement('div');
+    el.className = 'quest-item' + (done?' done':'');
+    el.onclick = () => toggleQuest(q.id);
+    el.innerHTML = `
+      <div class="quest-check">${done?'✓':''}</div>
+      <div class="quest-info">
+        <div class="quest-name">${q.name}</div>
+        <div class="quest-meta">${q.cond} &nbsp;·&nbsp; <span class="${cat.cls} cat-pill">${cat.label}</span></div>
+      </div>
+      <div class="quest-exp ${cat.expCls}">+${q.exp} XP</div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function toggleQuest(id) {
+  const q = getAllQuests().find(x=>x.id===id);
+  if (!q) return;
+
+  const wasDone = !!state.todayDone[id];
+  const oldTotal = getTotalExp();
+  const oldRank = getRankInfo(oldTotal).rank;
+
+  if (wasDone) {
+    delete state.todayDone[id];
+    state.totalExp[q.cat] = Math.max(0, (state.totalExp[q.cat]||0) - q.exp);
+    // remove from history
+    state.history = state.history.filter(h => !(h.date===today && h.questId===id));
+  } else {
+    state.todayDone[id] = true;
+    state.totalExp[q.cat] = (state.totalExp[q.cat]||0) + q.exp;
+    state.history.unshift({date:today, questId:id, questName:q.name, cat:q.cat, exp:q.exp});
+    state.lastActiveDate = today;
+    // update daily exp chart
+    state.dailyExp = state.dailyExp || {};
+    state.dailyExp[today] = (state.dailyExp[today]||0) + q.exp;
+  }
+
+  // update streak best
+  if ((state.streak||0) > (state.bestStreak||0)) state.bestStreak = state.streak;
+
+  saveState();
+
+  // check rank up
+  const newTotal = getTotalExp();
+  const newRank = getRankInfo(newTotal).rank;
+  if (newRank !== oldRank && !wasDone) showLvlUp(newRank);
+
+  renderQuests(currentFilter);
+  renderStatus();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LEVEL UP ANIMATION
+// ══════════════════════════════════════════════════════════════════
+function showLvlUp(rank) {
+  const overlay = document.getElementById('lvlup-overlay');
+  const rankText = document.getElementById('lvlup-rank-text');
+  const subText  = document.getElementById('lvlup-sub-text');
+  const rc = getRankColor(rank);
+
+  rankText.textContent = rank;
+  rankText.style.color = rc;
+  rankText.style.textShadow = `0 0 50px ${rc}`;
+  subText.textContent = `ยินดีด้วย! คุณเลื่อนขึ้นเป็น ${rank} Class!`;
+  overlay.classList.add('show');
+
+  // Sparkles
+  for (let i=0; i<20; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.textContent = ['⭐','✨','💥','⚡','🌟'][Math.floor(Math.random()*5)];
+    s.style.cssText = `
+      left: ${20+Math.random()*60}%;
+      top: ${20+Math.random()*60}%;
+      --tx: ${(Math.random()-0.5)*400}px;
+      --ty: ${(Math.random()-0.5)*400}px;
+      animation-delay: ${Math.random()*0.5}s;
+    `;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1500);
+  }
+}
+function closeLvlUp() {
+  document.getElementById('lvlup-overlay').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER HISTORY
+// ══════════════════════════════════════════════════════════════════
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  const empty = document.getElementById('history-empty');
+  const hist = state.history || [];
+
+  document.getElementById('history-count').textContent = hist.length + ' รายการ';
+  document.getElementById('hist-total-quests').textContent = hist.length;
+  document.getElementById('hist-total-exp').textContent = hist.reduce((s,h)=>s+h.exp,0).toLocaleString() + ' XP';
+  const days = new Set(hist.map(h=>h.date)).size;
+  document.getElementById('hist-active-days').textContent = days + ' วัน';
+
+  if (!hist.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = '';
+
+  // group by date
+  const grouped = {};
+  hist.forEach(h => { if (!grouped[h.date]) grouped[h.date]=[]; grouped[h.date].push(h); });
+
+  Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).forEach(date => {
+    const dateLabel = document.createElement('div');
+    dateLabel.style.cssText = 'font-size:0.7rem;color:var(--lgray);padding:8px 0 4px;font-family:Rajdhani,sans-serif;letter-spacing:0.1em;';
+    dateLabel.textContent = '📅 ' + new Date(date).toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'});
+    list.appendChild(dateLabel);
+
+    grouped[date].forEach(h => {
+      const cat = CAT_INFO[h.cat]||CAT_INFO['str'];
+      const el = document.createElement('div');
+      el.className = 'history-item';
+      el.innerHTML = `
+        <div class="history-dot" style="background:${h.cat==='str'?'var(--red)':h.cat==='int'?'var(--blue)':h.cat==='mnd'?'var(--purple)':'var(--orange)'};"></div>
+        <div style="flex:1;">
+          <div class="history-name">${h.questName}</div>
+          <div class="history-date"><span class="${cat.cls} cat-pill">${cat.label}</span></div>
+        </div>
+        <div class="history-exp ${cat.expCls}">+${h.exp} XP</div>
+      `;
+      list.appendChild(el);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER REWARDS
+// ══════════════════════════════════════════════════════════════════
+function renderRewards() {
+  const exp = getTotalExp();
+  document.getElementById('reward-exp-display').textContent = exp.toLocaleString() + ' XP';
+  const list = document.getElementById('reward-list');
+  list.innerHTML = '';
+
+  REWARDS.forEach(r => {
+    const redeemed = !!state.redeemed[r.id];
+    const canAfford = exp >= r.cost;
+    const el = document.createElement('div');
+    el.className = 'reward-card' + (redeemed?' redeemed':!canAfford?' locked':'');
+    el.onclick = () => !redeemed && canAfford && redeemReward(r.id);
+    el.innerHTML = `
+      <div class="reward-icon">${r.name.split(' ')[0]}</div>
+      <div style="flex:1;">
+        <div class="reward-name">${r.name.substring(r.name.indexOf(' ')+1)}</div>
+        <div class="reward-desc">${r.desc}</div>
+        <div class="reward-status">${redeemed ? '✅ แลกแล้ว' : canAfford ? '✅ ซื้อได้!' : '🔒 XP ไม่พอ'}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="reward-cost">${r.cost.toLocaleString()} XP</div>
+        ${!redeemed && canAfford ? '<button class="btn btn-gold btn-sm" style="margin-top:6px;">แลก</button>' : ''}
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function redeemReward(id) {
+  state.redeemed[id] = true;
+  saveState();
+  renderRewards();
+  // small sparkle
+  for (let i=0;i<8;i++) {
+    const s=document.createElement('div');
+    s.className='sparkle'; s.textContent='🎁';
+    s.style.cssText=`left:${30+Math.random()*40}%;top:${30+Math.random()*40}%;--tx:${(Math.random()-.5)*200}px;--ty:${(Math.random()-.5)*200}px;animation-delay:${Math.random()*.3}s;`;
+    document.body.appendChild(s); setTimeout(()=>s.remove(),1500);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER STATS
+// ══════════════════════════════════════════════════════════════════
+function renderStats() {
+  const hist = state.history||[];
+  const exp = getTotalExp();
+
+  document.getElementById('stat-days').textContent = new Set(hist.map(h=>h.date)).size + ' วัน';
+  document.getElementById('stat-quests').textContent = hist.length + ' ข้อ';
+  document.getElementById('stat-exp').textContent = exp.toLocaleString() + ' XP';
+  document.getElementById('stat-streak').textContent = (state.bestStreak||0) + ' วัน';
+
+  // stat bars
+  const maxStat = Math.max(state.totalExp.str||0,state.totalExp.int||0,state.totalExp.mnd||0,state.totalExp.wis||0,1);
+  ['str','int','mnd','wis'].forEach(s => {
+    const v = state.totalExp[s]||0;
+    document.getElementById('chart-'+s).textContent = v.toLocaleString() + ' XP';
+    document.getElementById('chart-'+s+'-bar').style.width = (v/maxStat*100)+'%';
+  });
+
+  // daily chart (14 days)
+  const bars = document.getElementById('chart-bars');
+  bars.innerHTML = '';
+  const days = [];
+  for (let i=13;i>=0;i--) {
+    const d = new Date(Date.now()-i*86400000).toISOString().slice(0,10);
+    days.push(d);
+  }
+  const maxExp = Math.max(...days.map(d=>(state.dailyExp||{})[d]||0), 1);
+
+  days.forEach(d => {
+    const v = (state.dailyExp||{})[d]||0;
+    const pct = v/maxExp*100;
+    const label = new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'});
+    const col = document.createElement('div');
+    col.className = 'chart-col';
+    col.innerHTML = `
+      <div class="chart-val">${v||''}</div>
+      <div class="chart-bar" style="height:${pct}%;background:linear-gradient(180deg,var(--teal),var(--blue));opacity:${0.4+pct/100*0.6};"></div>
+      <div class="chart-label">${label.split(' ')[0]}</div>
+    `;
+    bars.appendChild(col);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CUSTOM QUESTS
+// ══════════════════════════════════════════════════════════════════
+function addCustomQuest() {
+  const name = document.getElementById('cq-name').value.trim();
+  const cat  = document.getElementById('cq-cat').value;
+  const exp  = parseInt(document.getElementById('cq-exp').value)||30;
+  const cond = document.getElementById('cq-cond').value.trim() || 'ทำให้สำเร็จ';
+  if (!name) { alert('กรุณาใส่ชื่อ Quest'); return; }
+
+  const id = 'cq_' + Date.now();
+  state.customQuests = state.customQuests||[];
+  state.customQuests.push({id, name, cat, exp:Math.min(Math.max(exp,1),200), cond, custom:true});
+  saveState();
+
+  document.getElementById('cq-name').value='';
+  document.getElementById('cq-exp').value='';
+  document.getElementById('cq-cond').value='';
+  renderCustomQuests();
+}
+
+function deleteCustomQuest(id) {
+  state.customQuests = (state.customQuests||[]).filter(q=>q.id!==id);
+  saveState();
+  renderCustomQuests();
+}
+
+function renderCustomQuests() {
+  const list = document.getElementById('custom-quest-list');
+  const empty = document.getElementById('custom-quest-empty');
+  const quests = state.customQuests||[];
+  list.innerHTML='';
+  if (!quests.length) { empty.style.display='block'; return; }
+  empty.style.display='none';
+  quests.forEach(q => {
+    const cat = CAT_INFO[q.cat];
+    const el = document.createElement('div');
+    el.className='quest-item';
+    el.innerHTML=`
+      <div class="quest-info">
+        <div class="quest-name">${q.name}</div>
+        <div class="quest-meta">${q.cond} · <span class="${cat.cls} cat-pill">${cat.label}</span></div>
+      </div>
+      <div class="quest-exp ${cat.expCls}">+${q.exp} XP</div>
+      <button class="btn btn-danger btn-sm" onclick="deleteCustomQuest('${q.id}');event.stopPropagation();">🗑</button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MISC
+// ══════════════════════════════════════════════════════════════════
+function editName() {
+  const name = prompt('ชื่อ Hunter ของคุณ:', state.hunterName||'Hunter');
+  if (name !== null && name.trim()) {
+    state.hunterName = name.trim();
+    saveState();
+    renderStatus();
+  }
+}
+
+function resetTodayQuests() {
+  if (!confirm('รีเซต Quest วันนี้ทั้งหมด? (EXP จะถูกหักคืนด้วย)')) return;
+  const quests = getAllQuests();
+  quests.forEach(q => {
+    if (state.todayDone[q.id]) {
+      state.totalExp[q.cat] = Math.max(0, (state.totalExp[q.cat]||0) - q.exp);
+      state.history = state.history.filter(h=>!(h.date===today && h.questId===q.id));
+    }
+  });
+  state.todayDone = {};
+  if (state.dailyExp) state.dailyExp[today] = 0;
+  saveState();
+  renderQuests(currentFilter);
+  renderStatus();
+}
+
+function resetAll() {
+  if (!confirm('⚠️ รีเซตข้อมูลทั้งหมด?\nรวมถึง EXP, History, Rank ทั้งหมด!')) return;
+  if (!confirm('แน่ใจหรือ? ข้อมูลจะหายถาวร!')) return;
+  localStorage.removeItem('sl_state');
+  state = loadState();
+  renderStatus();
+  renderStats();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+renderStatus();
+</script>
+</body>
+</html>
